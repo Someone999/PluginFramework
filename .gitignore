@@ -1,0 +1,208 @@
+# Rider
+.idea/
+# User-specific files
+*.sln.iml
+*.suo
+*.user
+*.userosscache
+*.sln.dotsettings.user
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+# Visual Studio
+.vs/
+.vscode/
+# Resharper
+_ReSharper.*/
+# Test results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+[Db]inPS/
+[Ob]jPS/
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+**/Properties/launchSettings.json
+# StyleCop
+StyleCopReport.xml
+# NCrunch
+*.ncrunch*
+.*crunch*.local.xml
+nCrunchTemp_*
+# Installshield output folder
+[Ee]xpress/
+# DocProject
+[Dd]ocProject/buildhelp/
+[Dd]ocProject/Help/*.HxT
+[Dd]ocProject/Help/*.HxC
+[Dd]ocProject/Help/*.hhc
+[Dd]ocProject/Help/*.hhk
+[Dd]ocProject/Help/*.hhp
+[Dd]ocProject/Help/Html2
+[Dd]ocProject/Help/html
+# Click-Once directory
+publish/
+# Publish Web Output
+*.[Pp]ublish.xml
+*.azurePubxml
+# but database connection strings (with potential passwords) will be unencrypted
+*.pubxml
+*.publishproj
+# NuGet Packages Directory
+## TODO: If you have NuGet Package Restore enabled, uncomment the next line
+#packages/
+# Windows Azure Build Output
+csx/
+*.build.csdef
+# Windows Store app package directory
+AppPackages/
+# Others
+sql/
+TestResults/
+[Tt]emp/
+*.VC.db
+*.sqlite
+*.sqlite3
+*.psess
+*.vsp
+*.vspx
+*.sap
+*.ntvs*
+*.njsproj.user
+*.ldb
+*.opendb
+*.opendb.bak
+*.env
+*.env.user
+*.tmp
+*.tmp_proj
+*.tmp_proj.user
+*.dbmdl
+*.jfm
+*.jfm_fileListAbsolute.txt
+*.sdf
+*.mdf
+*.ldf
+*.mdf*
+*.ldf*
+*.mdf1
+*.ldf1
+*.bak
+*.bak1
+*.map
+*.diff
+*.patch
+*.swf
+*.db
+*.db3
+*.pdb
+*.gpState
+*.gpsState
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.o
+*.obj
+*.dll
+*.dll.mdb
+*.exe
+*.mdb
+*.psd
+*.tiff
+*.tif
+*.pdf
+*.fla
+*.jar
+*.zip
+*.rar
+*.gz
+*.tar
+*.7z
+*.bz2
+*.cab
+*.msi
+*.xap
+*.xapdeploy
+*.xapdeployxml
+*.xaplock
+*.docstates
+*.dotstates
+*.pdfstates
+*.xlsstates
+*.xla
+*.xll
+*.old
+*.xlk
+*.csv
+*.xlsx
+*.xltx
+*.xls
+*.xlt
+*.xlsb
+*.xlsm
+*.xltm
+*.xlam
+*.xlw
+*.xlr
+*.xl
+# Windows Azure Emulator
+# Windows Store app package directory
+# Others
+*.Publish.xml
+*.pfx
+*.snk
+*.config
+*.settings
+*.deploy
+*.cache
+*.userprefs
+*.manifest
+*.xml
+*.xsl
+*.xslt
+*.xsd
+*.xsc
+*.xss
+*.xsltproj
+*.vssettings
+*.vspscc
+*.vssscc
+*.csproj.user
+*.cppproj.user
+*.vcxproj.user
+*.ruleset
+*.sln.docstates
+*.log
+*.ilk
+*.meta
+*.pch
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*_i.c
+*_p.c
+*.aps
+*.ncb
+*.idb
+*.res
+*.vshost.*
+*.exe.mdb
+*.pdb.mdb
+*.suo.user
+*.vshost
