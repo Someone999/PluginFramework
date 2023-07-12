@@ -1,15 +1,15 @@
-using CommonLibrary.Collections.Transactional.Dictionaries;
-using CommonLibrary.Collections.Transactional.Lists;
-using CommonLibrary.Locks;
+using HsManCommonLibrary.Collections.ConcurrentCollections;
+using HsManCommonLibrary.Collections.Transactional.Lists;
+using HsManCommonLibrary.Locks;
 
 namespace PluginFramework.Plugins;
 
 public class PluginDependency
 {
-    private TransactionalDictionary<Type, TransactionalList<Plugin>> _dependencyDict = 
-        new TransactionalDictionary<Type, TransactionalList<Plugin>>();
-    private TransactionalDictionary<Type, TransactionalList<Type>> _pendingDependencyDict = 
-        new TransactionalDictionary<Type, TransactionalList<Type>>();
+    private TransactionalConcurrentDictionary<Type, TransactionalList<Plugin>> _dependencyDict = 
+        new TransactionalConcurrentDictionary<Type, TransactionalList<Plugin>>();
+    private TransactionalConcurrentDictionary<Type, TransactionalList<Type>> _pendingDependencyDict = 
+        new TransactionalConcurrentDictionary<Type, TransactionalList<Type>>();
 
     private LockManager _lockManager = new LockManager();
 
@@ -45,7 +45,7 @@ public class PluginDependency
         
             if (!_dependencyDict.ContainsKey(pluginType))
             {
-                _dependencyDict.Add(pluginType, new TransactionalList<Plugin>());
+                _dependencyDict.TryAdd(pluginType, new TransactionalList<Plugin>());
             }
 
             if (_dependencyDict[pluginType].Contains(plugin))
@@ -62,7 +62,7 @@ public class PluginDependency
        
             if (!_pendingDependencyDict.ContainsKey(pluginType))
             {
-                _pendingDependencyDict.Add(pluginType, new TransactionalList<Type>());
+                _pendingDependencyDict.TryAdd(pluginType, new TransactionalList<Type>());
             }
 
             if (_pendingDependencyDict[pluginType].Contains(dependencyType))

@@ -1,4 +1,4 @@
-using CommonLibrary.Locks;
+using HsManCommonLibrary.Locks;
 using PluginFramework.Events.EventRegistrations;
 
 namespace PluginFramework.Events;

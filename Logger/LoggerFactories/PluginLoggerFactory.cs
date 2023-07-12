@@ -1,7 +1,7 @@
-using CommonLibrary.Logger.Appender;
-using CommonLibrary.Logger.LoggerFactories;
-using CommonLibrary.Logger.Loggers;
-using CommonLibrary.Logger.Serializers;
+using HsManCommonLibrary.Logger.Appender;
+using HsManCommonLibrary.Logger.LoggerFactories;
+using HsManCommonLibrary.Logger.Loggers;
+using HsManCommonLibrary.Logger.Serializers;
 using PluginFramework.Logger.Loggers;
 
 namespace PluginFramework.Logger.LoggerFactories;

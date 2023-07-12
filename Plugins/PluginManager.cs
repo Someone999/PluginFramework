@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Text;
-using CommonLibrary.Locks;
-using CommonLibrary.Reflections;
+using HsManCommonLibrary.Locks;
+using HsManCommonLibrary.Reflections;
 using PluginFramework.Attributes;
 using PluginFramework.Events;
 using PluginFramework.Logger.LoggerFactories;

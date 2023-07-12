@@ -1,4 +1,4 @@
-using CommonLibrary.Exceptions;
+using HsManCommonLibrary.Exceptions;
 
 namespace PluginFramework.Plugins;
 

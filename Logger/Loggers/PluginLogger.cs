@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using System.Globalization;
-using CommonLibrary.Logger;
-using CommonLibrary.Logger.Appender;
-using CommonLibrary.Logger.LoggerFactories;
-using CommonLibrary.Logger.Loggers;
-using CommonLibrary.Logger.Renderers;
-using CommonLibrary.Logger.Serializers;
-using CommonLibrary.Utils;
+using HsManCommonLibrary.Logger;
+using HsManCommonLibrary.Logger.Appender;
+using HsManCommonLibrary.Logger.LoggerFactories;
+using HsManCommonLibrary.Logger.Loggers;
+using HsManCommonLibrary.Logger.Renderers;
+using HsManCommonLibrary.Logger.Serializers;
+using HsManCommonLibrary.Utils;
 
 namespace PluginFramework.Logger.Loggers;
 

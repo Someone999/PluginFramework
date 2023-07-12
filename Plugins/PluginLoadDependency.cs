@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using CommonLibrary.Locks;
+using HsManCommonLibrary.Locks;
 
 namespace PluginFramework.Plugins;
 

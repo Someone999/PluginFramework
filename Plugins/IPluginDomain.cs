@@ -1,4 +1,4 @@
-using CommonLibrary.Logger.LoggerFactories;
+using HsManCommonLibrary.Logger.LoggerFactories;
 using PluginFramework.Events;
 
 namespace PluginFramework.Plugins;

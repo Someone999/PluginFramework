@@ -1,4 +1,4 @@
-using CommonLibrary.Logger;
+using HsManCommonLibrary.Logger;
 using PluginLoggerFactory = PluginFramework.Logger.LoggerFactories.PluginLoggerFactory;
 
 
