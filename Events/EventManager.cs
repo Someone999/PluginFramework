@@ -1,7 +1,7 @@
 using HsManCommonLibrary.Locks;
-using PluginFramework.Events.EventRegistrations;
+using HsManPluginFramework.Events.EventRegistrations;
 
-namespace PluginFramework.Events;
+namespace HsManPluginFramework.Events;
 
 public class EventManager : IEventManager
 {

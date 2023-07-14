@@ -1,4 +1,4 @@
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public class PluginLoadResult
 {

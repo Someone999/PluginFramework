@@ -1,6 +1,6 @@
 using HsManCommonLibrary.Exceptions;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public abstract class Plugin
 {

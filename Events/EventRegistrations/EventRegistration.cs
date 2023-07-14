@@ -1,4 +1,4 @@
-namespace PluginFramework.Events.EventRegistrations;
+namespace HsManPluginFramework.Events.EventRegistrations;
 
 public abstract class EventRegistration
 {

@@ -1,8 +1,8 @@
 using HsManCommonLibrary.Logger;
-using PluginLoggerFactory = PluginFramework.Logger.LoggerFactories.PluginLoggerFactory;
+using PluginLoggerFactory = HsManPluginFramework.Logger.LoggerFactories.PluginLoggerFactory;
 
 
-namespace PluginFramework;
+namespace HsManPluginFramework;
 
 public class Program
 {

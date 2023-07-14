@@ -3,11 +3,11 @@ using System.Text;
 using HsManCommonLibrary.Locks;
 using HsManCommonLibrary.Reflections;
 using HsManCommonLibrary.ValueHolders;
-using PluginFramework.Attributes;
-using PluginFramework.Events;
-using PluginFramework.Logger.LoggerFactories;
+using HsManPluginFramework.Attributes;
+using HsManPluginFramework.Events;
+using HsManPluginFramework.Logger.LoggerFactories;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public class PluginManager
 {

@@ -1,6 +1,6 @@
-using PluginFramework.Events.EventRegistrations;
+using HsManPluginFramework.Events.EventRegistrations;
 
-namespace PluginFramework.Events;
+namespace HsManPluginFramework.Events;
 
 public interface IEventManager
 {

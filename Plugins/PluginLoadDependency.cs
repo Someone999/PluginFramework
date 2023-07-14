@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using HsManCommonLibrary.Locks;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 class PluginLoadDependency
 {

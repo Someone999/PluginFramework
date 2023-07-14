@@ -1,4 +1,4 @@
-namespace PluginFramework.Io;
+namespace HsManPluginFramework.Io;
 
 public interface IConsoleOutput : IStandardOutput
 {

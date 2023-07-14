@@ -2,7 +2,7 @@ using HsManCommonLibrary.Collections.ConcurrentCollections;
 using HsManCommonLibrary.Collections.Transactional.Lists;
 using HsManCommonLibrary.Locks;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public class PluginDependency
 {

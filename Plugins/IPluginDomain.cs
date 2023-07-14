@@ -1,7 +1,7 @@
 using HsManCommonLibrary.Logger.LoggerFactories;
-using PluginFramework.Events;
+using HsManPluginFramework.Events;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public interface IPluginDomain
 {

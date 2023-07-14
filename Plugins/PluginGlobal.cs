@@ -2,7 +2,7 @@
 
 using HsManCommonLibrary.ValueHolders;
 
-namespace PluginFramework.Plugins;
+namespace HsManPluginFramework.Plugins;
 
 public class PluginGlobal
 {

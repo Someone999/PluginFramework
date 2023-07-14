@@ -8,7 +8,7 @@ using HsManCommonLibrary.Logger.Renderers;
 using HsManCommonLibrary.Logger.Serializers;
 using HsManCommonLibrary.Utils;
 
-namespace PluginFramework.Logger.Loggers;
+namespace HsManPluginFramework.Logger.Loggers;
 
 public class PluginLogger : ILogger
 {

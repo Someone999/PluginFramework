@@ -1,4 +1,4 @@
-namespace PluginFramework.Attributes;
+namespace HsManPluginFramework.Attributes;
 
 public class PluginDependenciesAttribute : Attribute
 {

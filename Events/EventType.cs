@@ -1,4 +1,4 @@
-namespace PluginFramework.Events;
+namespace HsManPluginFramework.Events;
 
 public enum EventType
 {

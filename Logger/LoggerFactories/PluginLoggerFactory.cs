@@ -2,9 +2,9 @@ using HsManCommonLibrary.Logger.Appender;
 using HsManCommonLibrary.Logger.LoggerFactories;
 using HsManCommonLibrary.Logger.Loggers;
 using HsManCommonLibrary.Logger.Serializers;
-using PluginFramework.Logger.Loggers;
+using HsManPluginFramework.Logger.Loggers;
 
-namespace PluginFramework.Logger.LoggerFactories;
+namespace HsManPluginFramework.Logger.LoggerFactories;
 
 public class PluginLoggerFactory : ILoggerFactory
 {
