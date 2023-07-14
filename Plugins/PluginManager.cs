@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text;
 using HsManCommonLibrary.Locks;
 using HsManCommonLibrary.Reflections;
+using HsManCommonLibrary.ValueHolders;
 using PluginFramework.Attributes;
 using PluginFramework.Events;
 using PluginFramework.Logger.LoggerFactories;
@@ -10,20 +11,23 @@ namespace PluginFramework.Plugins;
 
 public class PluginManager
 {
-    private PluginLoader _loader = new PluginLoader();
-    private PluginLoadDependency _loadDependency = new PluginLoadDependency();
-    private Dictionary<Type, PluginDomain> _domains = new Dictionary<Type, PluginDomain>();
-    private PluginDependency _dependency = new PluginDependency();
+    private readonly PluginGlobal _pluginGlobal = new PluginGlobal();
+    private readonly PluginLoader _loader = new PluginLoader();
+    private readonly PluginLoadDependency _loadDependency = new PluginLoadDependency();
+    private readonly Dictionary<Type, PluginDomain> _domains = new Dictionary<Type, PluginDomain>();
+
+    public PluginDependency Dependency { get; } = new PluginDependency();
 
     public PluginManager()
     {
         _loadDependency.OnDependenciesSatisfied += DependencySatisfiedHandler;
         _loadDependency.OnDependencyLoaded += DependencyLoadedHandler;
+        _pluginGlobal.PluginManager = new ReadonlyValueHolder<PluginManager>(this);
     }
 
     public PluginDomain[] GetPluginDomains() => _domains.Values.ToArray();
 
-    private LockManager _lockManager = new LockManager();
+    private readonly LockManager _lockManager = new LockManager();
     private object CreateOrGetLocker(string functionName)
     {
         return _lockManager.AcquireLockObject(functionName);
@@ -39,7 +43,7 @@ public class PluginManager
     }
 
     
-    PluginDomain? CreatePluginDomain(Type pluginType)
+    PluginDomain? CreatePluginDomain(Type pluginType, PluginGlobal pluginGlobal)
     {
         lock (CreateOrGetLocker("CreatePluginDomain"))
         {
@@ -50,8 +54,7 @@ public class PluginManager
                 return null;
             }
 
-            PluginDomain domain = new PluginDomain(loadResult.Instance, new PluginLoggerFactory(), new EventManager());
-
+            PluginDomain domain = new PluginDomain(loadResult.Instance, new PluginLoggerFactory(), new EventManager(), pluginGlobal);
             domain.CurrentPlugin.PluginDomain = domain;
             domain.CurrentPlugin.OnLoad();
             _domains.Add(pluginType, domain);
@@ -60,23 +63,24 @@ public class PluginManager
         }
     }
         
-    void LoadPluginWithoutDependency(Type pluginType)
+    void LoadPluginWithoutDependency(Type pluginType, PluginGlobal global)
     {
-        CreatePluginDomain(pluginType);
+        
+        CreatePluginDomain(pluginType, global);
     }
 
     void DependencySatisfiedHandler(Type pluginType, Type dependencyType)
     {
         lock (CreateOrGetLocker("DependencySatisfiedHandler"))
         {
-            var pluginDomain = CreatePluginDomain(pluginType);
+            var pluginDomain = CreatePluginDomain(pluginType, _pluginGlobal);
             if (pluginDomain == null)
             {
                 return;
             }
             
-            _dependency.AddDependency(pluginType, pluginDomain.CurrentPlugin);
-            _dependency.CommitPendingDependency(pluginDomain.CurrentPlugin);
+            Dependency.AddDependency(pluginType, pluginDomain.CurrentPlugin);
+            Dependency.CommitPendingDependency(pluginDomain.CurrentPlugin);
         }
         
     }
@@ -85,7 +89,7 @@ public class PluginManager
     {
         lock (CreateOrGetLocker("DependencySatisfiedHandler"))
         {
-            _dependency.AddPendingDependency(dependencyType, pluginType);
+            Dependency.AddPendingDependency(dependencyType, pluginType);
         }
         
     }
@@ -97,7 +101,7 @@ public class PluginManager
             var dependenciesAttr = pluginType.GetCustomAttribute<PluginDependenciesAttribute>();
             if (dependenciesAttr == null || dependenciesAttr.Dependencies.Length == 0)
             {
-                LoadPluginWithoutDependency(pluginType);
+                LoadPluginWithoutDependency(pluginType, _pluginGlobal);
                 return;
             }
             
@@ -109,12 +113,15 @@ public class PluginManager
 
     public void LoadPlugins()
     {
-        if (_loaded)
+        lock (_lockManager.AcquireLockObject("LoadPlugins"))
         {
-            return;
-        }
+            if (_loaded)
+            {
+                return;
+            }
         
-        InternalLoadPlugins();
+            InternalLoadPlugins();
+        }
     }
     
     private void InternalLoadPlugins()
@@ -139,20 +146,19 @@ public class PluginManager
     
     private void InternalLoadPluginsMultiThread()
     {
-        List<Task> _loadTasks = new List<Task>();
+        List<Task> loadTasks = new List<Task>();
         lock (CreateOrGetLocker("DependencySatisfiedHandler"))
         {
             Type[] pluginTypes = ScanPlugins();
-            int pluginTypeCount = pluginTypes.Length;
             foreach (var pluginType in pluginTypes)
             {
-                _loadTasks.Add(Task.Run(() =>
+                loadTasks.Add(Task.Run(() =>
                 {
                     LoadPluginWithDependency(pluginType);
                 }));
             }
 
-            Task.WaitAll(_loadTasks.ToArray());
+            Task.WaitAll(loadTasks.ToArray());
 
             if (_loadDependency.HasPendingPlugin)
             {
@@ -171,9 +177,14 @@ public class PluginManager
         {
             var pluginType = unsatisfiedDependency.GetType();
             var showTypeName = pluginType.FullName ?? pluginType.Name;
-            
-            
+            showContentStringBuilder.AppendLine(showTypeName);
+            foreach (var dependency in unsatisfiedDependencies.Values)
+            {
+                showContentStringBuilder.AppendLine("    " + dependency);
+            }
         }
+        
+        Console.WriteLine(showContentStringBuilder);
     }
         
 }
