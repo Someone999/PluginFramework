@@ -1,4 +1,5 @@
 using HsManCommonLibrary.Locks;
+using HsManPluginFramework.Attributes;
 using HsManPluginFramework.Events.EventRegistrations;
 
 namespace HsManPluginFramework.Events;
@@ -91,7 +92,15 @@ public class EventManager : IEventManager
 
     public object? RaiseEvent(string identifier, object[] args)
     {
-        return GetEventRegistration(identifier).EventHandler?.DynamicInvoke(args);
+        var eventHandler = GetEventRegistration(identifier).EventHandler;
+        if (eventHandler == null)
+        {
+            return null;
+        }
+
+        return eventHandler.GetType().IsDefined(typeof(AsyncEventAttribute), false)
+            ? Task.Run(() => eventHandler.DynamicInvoke(args))
+            : eventHandler.DynamicInvoke(args);
     }
     
 }

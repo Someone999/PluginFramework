@@ -74,7 +74,6 @@ public class PluginLoggerFactory : ILoggerFactory
         var newLogger = new PluginLogger(this, DefaultAppender);
         _loggers.Add(name, newLogger);
         return newLogger;
-
     }
     
 

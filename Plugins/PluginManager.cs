@@ -1,8 +1,8 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 using HsManCommonLibrary.Locks;
 using HsManCommonLibrary.Reflections;
-using HsManCommonLibrary.ValueHolders;
 using HsManPluginFramework.Attributes;
 using HsManPluginFramework.Events;
 using HsManPluginFramework.Logger.LoggerFactories;
@@ -11,100 +11,93 @@ namespace HsManPluginFramework.Plugins;
 
 public class PluginManager
 {
-    private readonly PluginGlobal _pluginGlobal = new PluginGlobal();
-    private readonly PluginLoader _loader = new PluginLoader();
     private readonly PluginLoadDependency _loadDependency = new PluginLoadDependency();
-    private readonly Dictionary<Type, PluginDomain> _domains = new Dictionary<Type, PluginDomain>();
+    private readonly ConcurrentDictionary<Type, PluginDomain> _domains = new ConcurrentDictionary<Type, PluginDomain>();
 
     public PluginDependency Dependency { get; } = new PluginDependency();
+    public bool PluginLoaded => _loaded;
 
-    public PluginManager()
+    private PluginManager()
     {
         _loadDependency.OnDependenciesSatisfied += DependencySatisfiedHandler;
         _loadDependency.OnDependencyLoaded += DependencyLoadedHandler;
-        _pluginGlobal.PluginManager = new ReadonlyValueHolder<PluginManager>(this);
     }
 
     public PluginDomain[] GetPluginDomains() => _domains.Values.ToArray();
 
     private readonly LockManager _lockManager = new LockManager();
-    private object CreateOrGetLocker(string functionName)
-    {
-        return _lockManager.AcquireLockObject(functionName);
-    }
 
     public Type[] ScanPlugins()
     {
         string asmDir = Path.GetDirectoryName(GetType().Assembly.Location) ?? "";
-        ReflectionAssemblyManager.AddAssembliesFromPath(Path.Combine(asmDir, "plugins/"), false);
+        if(Directory.Exists(Path.Combine(asmDir, "plugins/")))
+        {
+            ReflectionAssemblyManager.AddAssembliesFromPath(Path.Combine(asmDir, "plugins/"), false);
+        }
+        
         var allTypes = ReflectionAssemblyManager.CreateAssemblyTypeCollection();
         var pluginTypes = allTypes.GetSubTypesOf<Plugin>();
         return pluginTypes;
     }
 
-    
-    PluginDomain? CreatePluginDomain(Type pluginType, PluginGlobal pluginGlobal)
-    {
-        lock (CreateOrGetLocker("CreatePluginDomain"))
-        {
-            var loadResult = _loader.LoadPlugin(pluginType);
-            if (!loadResult.Success || loadResult.Instance == null)
-            {
-                Console.WriteLine($"Load failed: {loadResult.Message}  {loadResult.LoadException?.Message ?? "null"}");
-                return null;
-            }
 
-            PluginDomain domain = new PluginDomain(loadResult.Instance, new PluginLoggerFactory(), new EventManager(), pluginGlobal);
-            domain.CurrentPlugin.PluginDomain = domain;
-            domain.CurrentPlugin.OnLoad();
-            _domains.Add(pluginType, domain);
-            _loadDependency.Notify(pluginType, pluginType.FullName ?? "");
-            return domain;
-        }
-    }
-        
-    void LoadPluginWithoutDependency(Type pluginType, PluginGlobal global)
+    PluginDomain? CreatePluginDomain(Type pluginType)
     {
-        
-        CreatePluginDomain(pluginType, global);
+        var loadResult = PluginLoader.LoadPlugin(pluginType);
+        if (!loadResult.Success || loadResult.Instance == null)
+        {
+            Console.WriteLine($"Load failed: {loadResult.Message}  {loadResult.LoadException?.Message ?? "null"}");
+            return null;
+        }
+
+        PluginDomain domain = new PluginDomain(loadResult.Instance, new PluginLoggerFactory(), new EventManager());
+        domain.CurrentPlugin.PluginDomain = domain;
+        domain.PluginManager = this;
+        domain.CurrentPlugin.OnLoad();
+        _domains.TryAdd(pluginType, domain);
+        _loadDependency.Notify(pluginType, pluginType.FullName ?? "");
+        return domain;
+    }
+
+    void LoadPluginWithoutDependency(Type pluginType)
+    {
+        CreatePluginDomain(pluginType);
     }
 
     void DependencySatisfiedHandler(Type pluginType, Type dependencyType)
     {
-        lock (CreateOrGetLocker("DependencySatisfiedHandler"))
+        lock (_lockManager.AcquireLockObject("DependencySatisfiedHandler"))
         {
-            var pluginDomain = CreatePluginDomain(pluginType, _pluginGlobal);
+            var pluginDomain = CreatePluginDomain(pluginType);
             if (pluginDomain == null)
             {
                 return;
             }
-            
+
             Dependency.AddDependency(pluginType, pluginDomain.CurrentPlugin);
             Dependency.CommitPendingDependency(pluginDomain.CurrentPlugin);
         }
-        
     }
-        
+
     void DependencyLoadedHandler(Type dependencyType, string dependencyFullName, Type pluginType)
     {
-        lock (CreateOrGetLocker("DependencySatisfiedHandler"))
+        lock (_lockManager.AcquireLockObject("DependencySatisfiedHandler"))
         {
             Dependency.AddPendingDependency(dependencyType, pluginType);
         }
-        
     }
 
     void LoadPluginWithDependency(Type pluginType)
     {
-        lock (CreateOrGetLocker("DependencySatisfiedHandler"))
+        lock (_lockManager.AcquireLockObject("DependencySatisfiedHandler"))
         {
             var dependenciesAttr = pluginType.GetCustomAttribute<PluginDependenciesAttribute>();
             if (dependenciesAttr == null || dependenciesAttr.Dependencies.Length == 0)
             {
-                LoadPluginWithoutDependency(pluginType, _pluginGlobal);
+                LoadPluginWithoutDependency(pluginType);
                 return;
             }
-            
+
             _loadDependency.Add(pluginType, dependenciesAttr.Dependencies);
         }
     }
@@ -119,14 +112,15 @@ public class PluginManager
             {
                 return;
             }
-        
+
             InternalLoadPlugins();
         }
     }
-    
+
     private void InternalLoadPlugins()
     {
-        lock (CreateOrGetLocker("DependencySatisfiedHandler"))
+        lock (_lockManager.AcquireLockObject(
+                  "DependencySatisfiedHandler"))
         {
             Type[] pluginTypes = ScanPlugins();
             foreach (var pluginType in pluginTypes)
@@ -142,31 +136,34 @@ public class PluginManager
             _loaded = true;
         }
     }
-    
-    
+
+
     private void InternalLoadPluginsMultiThread()
     {
         List<Task> loadTasks = new List<Task>();
-        lock (CreateOrGetLocker("DependencySatisfiedHandler"))
+        Type[] pluginTypes = ScanPlugins();
+        foreach (var pluginType in pluginTypes)
         {
-            Type[] pluginTypes = ScanPlugins();
-            foreach (var pluginType in pluginTypes)
+            loadTasks.Add(Task.Run(() =>
             {
-                loadTasks.Add(Task.Run(() =>
+                lock (_lockManager.AcquireLockObject("InternalLoadPluginsMultiThread::PluginLoader"))
                 {
                     LoadPluginWithDependency(pluginType);
-                }));
-            }
+                }
+            }));
+        }
 
-            Task.WaitAll(loadTasks.ToArray());
+        Task.WaitAll(loadTasks.ToArray());
 
+        lock (_lockManager.AcquireLockObject("InternalLoadPluginsMultiThread::LoadDependency"))
+        {
             if (_loadDependency.HasPendingPlugin)
             {
                 Console.WriteLine("One or more plugins failed to load because of dependency.");
             }
-
-            _loaded = true;
         }
+
+        _loaded = true;
     }
 
     private void OutputUnsatisfiedDependencies()
@@ -183,8 +180,24 @@ public class PluginManager
                 showContentStringBuilder.AppendLine("    " + dependency);
             }
         }
-        
+
         Console.WriteLine(showContentStringBuilder);
     }
-        
+
+    private static PluginManager? _ins;
+    private static object StaticLocker { get; } = new object();
+
+    public static PluginManager GetInstance()
+    {
+        if (_ins != null)
+        {
+            return _ins;
+        }
+
+        lock (StaticLocker)
+        {
+            _ins ??= new PluginManager();
+            return _ins;
+        }
+    } 
 }

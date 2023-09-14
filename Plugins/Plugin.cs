@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using HsManCommonLibrary.Exceptions;
 
 namespace HsManPluginFramework.Plugins;

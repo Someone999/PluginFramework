@@ -1,8 +1,8 @@
 namespace HsManPluginFramework.Plugins;
 
-class PluginLoader
+static class PluginLoader
 {
-    public PluginLoadResult LoadPlugin(Type pluginType)
+    public static PluginLoadResult LoadPlugin(Type pluginType)
     {
         if (pluginType.IsAbstract || pluginType.IsInterface)
         {
@@ -18,5 +18,11 @@ class PluginLoader
         {
             return new PluginLoadResult(false, loadException: e, msg: "Exception occurred when loading");
         }
+    }
+
+    public static async Task<PluginLoadResult> LoadPluginAsync(Type pluginType)
+    {
+        await Task.Yield();
+        return LoadPlugin(pluginType);
     }
 }

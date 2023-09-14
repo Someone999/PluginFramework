@@ -1,17 +1,14 @@
 using HsManCommonLibrary.Collections.ConcurrentCollections;
 using HsManCommonLibrary.Collections.Transactional.Lists;
-using HsManCommonLibrary.Locks;
 
 namespace HsManPluginFramework.Plugins;
 
 public class PluginDependency
 {
-    private TransactionalConcurrentDictionary<Type, TransactionalList<Plugin>> _dependencyDict = 
-        new TransactionalConcurrentDictionary<Type, TransactionalList<Plugin>>();
+    private TransactionalConcurrentDictionary<Type, TransactionalConcurrentBag<Plugin>> _dependencyDict = 
+        new TransactionalConcurrentDictionary<Type, TransactionalConcurrentBag<Plugin>>();
     private TransactionalConcurrentDictionary<Type, TransactionalList<Type>> _pendingDependencyDict = 
         new TransactionalConcurrentDictionary<Type, TransactionalList<Type>>();
-
-    private LockManager _lockManager = new LockManager();
 
     private async Task<bool> InternalIsReferencedAsync(Type plugin)
     {
@@ -45,7 +42,7 @@ public class PluginDependency
         
             if (!_dependencyDict.ContainsKey(pluginType))
             {
-                _dependencyDict.TryAdd(pluginType, new TransactionalList<Plugin>());
+                _dependencyDict.TryAdd(pluginType, new TransactionalConcurrentBag<Plugin>());
             }
 
             if (_dependencyDict[pluginType].Contains(plugin))
@@ -54,7 +51,6 @@ public class PluginDependency
             }
             
             _dependencyDict[pluginType].Add(plugin);
-        
     }
 
     public void AddPendingDependency(Type dependencyType, Type pluginType)
